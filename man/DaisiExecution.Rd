@@ -4,12 +4,14 @@
 \alias{DaisiExecution}
 \title{Generate a new execution of a given Daisi}
 \usage{
-DaisiExecution(daisi, args)
+DaisiExecution(daisi, endpoint, ...)
 }
 \arguments{
 \item{daisi}{The Daisi object, initialized with Daisi()}
 
-\item{args}{A named list of arguments to provide to the Daisi}
+\item{endpoint}{The endpoint of the Daisi to call}
+
+\item{...}{Arguments passed onto the underlying Daisi}
 }
 \value{
 DaisiExecution object with the Execution parameters
@@ -29,4 +31,5 @@ Sys.sleep(1)
 
 de$value()
 }
+
 }

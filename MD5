@@ -1,10 +1,10 @@
-4113ce5331c9bf6d3ed1a9852b2d5b4f *DESCRIPTION
+f8652f426a7ec756fde6bb87d3d200b1 *DESCRIPTION
 5c5e8148e675bb53a87ef22d01c11447 *NAMESPACE
-775312c6caff14497a1a29d7534ceb12 *R/rdaisi.R
+4edb135f3010a944c4daebbd2f0894a6 *R/rdaisi.R
 10a14ad3d2bf929ab0a84185f9f54a99 *README.md
 0355bf717c937d57c436566b1038fd1c *inst/python/r_py_helpers.py
-399f33663881f9c5e3e8b031af2e4f63 *man/Daisi.Rd
-4352a1eb3ef60b6e4718d84b8ea05df0 *man/DaisiExecution.Rd
+7b2ffbcd4fd53e3eae7ff4c183b6d31f *man/Daisi.Rd
+b508ce9fe0d04e168282466082571c4b *man/DaisiExecution.Rd
 3321f6315f4ed863524c05a0e635bec7 *man/DaisiMapExecution.Rd
 37d07e8d611862a74418ee5e503ab70c *man/configure_daisi.Rd
 1366330db0255d908f7561aadd6721df *man/execute_daisi.Rd

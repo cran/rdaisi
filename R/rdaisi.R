@@ -13,7 +13,6 @@
 #' }
 configure_daisi <- function(python_path = NULL,
                             daisi_instance = "app") {
-
     if (!is.null(python_path)) {
         Sys.setenv(RETICULATE_PYTHON=python_path)
     }
@@ -32,8 +31,6 @@ configure_daisi <- function(python_path = NULL,
 #' @importFrom httr GET content add_headers
 #'
 result_daisi <- function(daisi_execution) {
-    print(paste0("Fetching Result: ", daisi_execution$id))
-
     r <- GET(
         paste0(daisi_execution$daisi$base_url, "/", daisi_execution$daisi$id, "/executions/", daisi_execution$id, "/results?download=true"),
                add_headers(c('Client'= 'pydaisi'))
@@ -52,10 +49,8 @@ result_daisi <- function(daisi_execution) {
 #' @importFrom httr POST content
 #'
 execute_daisi <- function(daisi_execution) {
-    print(paste0("Executing Daisi: ", daisi_execution$daisi$id))
-
     r <- POST(
-        paste0(daisi_execution$daisi$base_url, "/", daisi_execution$daisi$id, "/executions"),
+        paste0(daisi_execution$daisi$base_url, "/", daisi_execution$daisi$id, "/executions/", daisi_execution$endpoint),
         body = daisi_execution$parsed_args,
         encode = "json"
     )
@@ -82,8 +77,10 @@ execute_daisi <- function(daisi_execution) {
 #' d <- Daisi("Add Two Numbers")
 #' d
 #' }
-Daisi <- function(daisi_id, base_url="https://app.daisi.io") {
-    py_call <- py_run_file(system.file(file.path("python", "r_py_helpers.py"), package="rdaisi"))
+Daisi <- function(daisi_id, base_url = NULL) {
+    if (is.null(base_url)) {
+        base_url <- Sys.getenv("DAISI_BASE_URL")
+    }
 
     print(paste0("Looking for Daisi: ", daisi_id))
     print(paste0(base_url, Sys.getenv("DAISI_NEW_ROUTE"), "/connect?name=", gsub(" ", "%20", daisi_id)))
@@ -95,17 +92,32 @@ Daisi <- function(daisi_id, base_url="https://app.daisi.io") {
         base_url = paste0(base_url, Sys.getenv("DAISI_BASE_ROUTE")),
         name = result$name,
         endpoints = result$endpoints,
-        py_call = py_call
+        py_call = py_run_file(system.file(file.path("python", "r_py_helpers.py"), package="rdaisi"))
     )
 
     class(daisi_obj) <- "daisi"
+
+    endpoint_names <- sapply(daisi_obj$endpoints, function(x) x$name)
+
+    all_functions <- lapply(endpoint_names, function(endpoint) {
+        function(...) { DaisiExecution(daisi_obj,
+                                    endpoint = eval(substitute(endpoint, env = parent.frame())),
+                                    ...) }
+    })
+    names(all_functions) <- endpoint_names
+
+    for (func in names(all_functions)) {
+        daisi_obj[[func]] <- all_functions[[func]]
+    }
 
     return(daisi_obj)
 }
 
 #' Generate a new execution of a given Daisi
 #' @param daisi The Daisi object, initialized with Daisi()
-#' @param args A named list of arguments to provide to the Daisi
+#' @param endpoint The endpoint of the Daisi to call
+#' @param ... Arguments passed onto the underlying Daisi
+#'
 #' @return DaisiExecution object with the Execution parameters
 #'
 #' @export
@@ -122,18 +134,18 @@ Daisi <- function(daisi_id, base_url="https://app.daisi.io") {
 #'
 #' de$value()
 #' }
-DaisiExecution <- function(daisi, args) {
+#'
+DaisiExecution <- function(daisi, endpoint, ...) {
     daisi_exec_obj <- list(
         id = NULL,
         daisi = daisi,
-        status = "NOT_STARTED",
-        parsed_args = args
+        endpoint = endpoint,
+        status = "STARTED",
+        parsed_args = list(...)
     )
 
     daisi_exec_obj$id <- execute_daisi(daisi_exec_obj)
-    daisi_exec_obj$value <- function() {
-        result_daisi(daisi_exec_obj)
-    }
+    daisi_exec_obj$value <- function() { result_daisi(daisi_exec_obj) }
 
     return(daisi_exec_obj)
 }
@@ -159,8 +171,6 @@ DaisiExecution <- function(daisi, args) {
 #' deb
 #' }
 DaisiMapExecution <- function(daisi, args_list) {
-    print(paste0("Bulk Executing Daisi: ", daisi$id))
-
     my_exec <- list()
     for (args in args_list) {
         de = DaisiExecution(daisi, args)

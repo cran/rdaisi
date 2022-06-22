@@ -4,7 +4,7 @@
 \alias{Daisi}
 \title{Initialize and connect to the given Daisi}
 \usage{
-Daisi(daisi_id, base_url = "https://app.daisi.io")
+Daisi(daisi_id, base_url = NULL)
 }
 \arguments{
 \item{daisi_id}{The name or UUID of the daisi}
