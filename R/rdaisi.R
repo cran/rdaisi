@@ -31,6 +31,18 @@ configure_daisi <- function(python_path = NULL,
 #' @importFrom httr GET content add_headers
 #'
 result_daisi <- function(daisi_execution) {
+    current_status = daisi_execution$status
+    while (!(current_status %in% c("\"FAILED\"", "\"FINISHED\""))) {
+        r <- GET(
+            paste0(daisi_execution$daisi$base_url, "/", daisi_execution$daisi$id, "/executions/", daisi_execution$id, "/status"),
+            add_headers(c('Client'= 'pydaisi'))
+        )
+
+        current_status <- content(r, "text")
+
+        Sys.sleep(.25)
+    }
+
     r <- GET(
         paste0(daisi_execution$daisi$base_url, "/", daisi_execution$daisi$id, "/executions/", daisi_execution$id, "/results?download=true"),
                add_headers(c('Client'= 'pydaisi'))
