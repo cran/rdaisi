@@ -38,7 +38,7 @@ result_daisi <- function(daisi_execution) {
             add_headers(c('Client'= 'pydaisi'))
         )
 
-        current_status <- content(r, "text")
+        current_status <- content(r, "text", encoding = "UTF-8")
 
         Sys.sleep(.25)
     }

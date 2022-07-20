@@ -13,7 +13,7 @@ install.packages("rdaisi")
 2. Configure your `rdaisi` R Client, setting the path to your Python installation as needed:
 
 ```r
-configure_daisi(python_path = "/usr/local/bin/python3", daisi_instance = "app")
+configure_daisi(python_path = "/usr/local/bin/python3")
 ```
 
 3. Connect to a Daisi:
@@ -25,6 +25,5 @@ d <- Daisi("Add Two Numbers")
 4. Execute a Daisi!
 
 ```r
-de <- DaisiExecution(d, list(firstNumber = 5, secondNumber = 6))
-de$value()
+d$compute(firstNumber = 4, secondNumber = 5)$value()
 ```
